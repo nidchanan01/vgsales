@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Game Sales</title>
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: 2rem auto; }
+    .card { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; }
+    th { background: #eef; }
+    pre { background: #222; color: #eee; padding: 1rem; overflow-x: auto; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Video Game Sales</h1>
+
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+  <div class="card">
+    <h2>Query 1: Top N เกมขายดีในแต่ละแนว</h2>
+    <p>ใช้ Window Function (RANK ... PARTITION BY) จัดอันดับเกมแยกตามแนวเกม</p>
+    <form method="POST">
+      <input type="hidden" name="which" value="q1">
+      Top <input type="number" name="top_n" value="{{ top_n }}" min="1" max="10">
+      <button type="submit">Run Query 1</button>
+    </form>
+    <details><summary>ดู SQL</summary><pre>{{ sql_q1 }}</pre></details>
+    {% if result.q1 %}
+    <table>
+      <tr>{% for c in result.q1[0] %}<th>{{ c }}</th>{% endfor %}</tr>
+      {% for row in result.q1[1] %}
+      <tr>{% for v in row %}<td>{{ v }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2>Query 2: ยอดขายรายปีและ % การเติบโตเทียบปีก่อน</h2>
+    <p>ใช้ CTE (WITH) รวมยอดขายรายปี แล้วใช้ LAG() ดึงยอดปีก่อนหน้ามาคำนวณ % การเติบโต</p>
+    <form method="POST">
+      <input type="hidden" name="which" value="q2">
+      <button type="submit">Run Query 2</button>
+    </form>
+    <details><summary>ดู SQL</summary><pre>{{ sql_q2 }}</pre></details>
+    {% if result.q2 %}
+    <table>
+      <tr>{% for c in result.q2[0] %}<th>{{ c }}</th>{% endfor %}</tr>
+      {% for row in result.q2[1] %}
+      <tr>{% for v in row %}<td>{{ v if v is not none else '-' }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+  
+</body>
+</html>
